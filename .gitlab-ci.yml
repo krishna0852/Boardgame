@@ -1,0 +1,30 @@
+stages:
+   - Pre-conifgure-tools
+   - Test 
+
+
+
+Preconfigure:
+   stage: Pre-configure-tools
+   script:
+      - sudo apt-get update -y
+      - sudo apt install openjdk-17-jre-headless
+      - sudo apt install maven
+      - sudo apt-get install docker.io -y && sudo usermod -aG docker gitlab-runner
+      - sudo apt-get install wget gnupg
+      - wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+      - echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+      - sudo apt-get update
+      - sudo apt-get install trivy
+      - sudo snap install kubectl --classic.
+   tags:
+    - cicd 
+    - server
+
+Unit_Test_cases:
+  stage: Test 
+  script: 
+    mvn test
+  tags:
+    - cicd 
+    - server
